@@ -1,27 +1,26 @@
-import './App.css';
-import Form from './components/Form';
-import UserHome from './components/UserHome';
-import AdminHome from './components/AdminHome';
-import ChangePassword from './components/ChangePassword';
-import CreateUser from './components/CreateUser'; // Importa el nuevo componente
-import CreateAdmin from './components/CreateAdmin';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
+import UserForm from "./components/UserForm";
+import Dashboard from "./components/Dashboard";
 
 function App() {
-  const [user, setUser] = useState(null);
-
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route index element={<Form callback={setUser} />} />
-        <Route path='/userHome' element={<UserHome user={user} />} />
-        <Route path='/adminHome' element={<AdminHome user={user} />} />
-        <Route path='/changePassword' element={<ChangePassword />} />
-        <Route path='/createUser' element={<CreateUser />} />
-        <Route path='/createAdmin' element={<CreateAdmin />} />
-      </Routes>
-    </BrowserRouter>
+    <Router>
+      <div className="min-h-screen bg-gray-100">
+        <nav className="bg-blue-600 text-white p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <h1 className="font-bold text-xl">Panel Admin</h1>
+          <div className="space-x-4">
+            <Link to="/crear-usuario" className="hover:underline">Crear Usuario</Link>
+            <Link to="/dashboard" className="hover:underline">Dashboard</Link>
+          </div>
+        </nav>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/crear-usuario" element={<UserForm />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
