@@ -1,3 +1,9 @@
+¡Genial! 🙌
+Entonces dejamos toda la lógica consistente en Dashboard.jsx, normalizando v.vendedor → usuario para que el gráfico de SalesByUserChart funcione sin tocarlo.
+
+Aquí tienes el archivo completo y ajustado con esa corrección y los formateos ya listos 👇
+
+📌 Dashboard.jsx (final con topVendedores normalizado)
 import { useEffect, useState } from "react";
 import {
   BarChart,
@@ -27,7 +33,7 @@ export default function Dashboard() {
     fetch(url)
       .then((res) => res.json())
       .then((res) => {
-        // Normalizar
+        // Normalizar valores numéricos
         res.metas.cantidad = Number(res.metas.cantidad);
         res.metas.valor = Number(res.metas.valor);
         res.metas.progresoCantidad = Number(res.metas.progresoCantidad);
@@ -41,11 +47,14 @@ export default function Dashboard() {
           ...p,
           valor: Number(p.valor),
         }));
+
+        // 🔑 CORRECCIÓN: pasar vendedor → usuario
         res.topVendedores = res.topVendedores.map((v) => ({
           usuario: v.vendedor,
           cantidad: Number(v.cantidad),
           valor: Number(v.valor),
         }));
+
         setData(res);
       })
       .catch((err) => console.error("Error cargando dashboard:", err));
