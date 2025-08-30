@@ -3,6 +3,9 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recha
 
 const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7f7f", "#8dd1e1", "#a4de6c", "#d0ed57", "#ffc0cb"];
 
+const numberFormatter = (value) =>
+  new Intl.NumberFormat("es-CO").format(value);
+
 const SalesByUserChart = ({ data }) => {
   const [filtro, setFiltro] = useState("cantidad");
 
@@ -24,18 +27,20 @@ const SalesByUserChart = ({ data }) => {
           <Pie
             data={data}
             dataKey={filtro}
-            nameKey="usuario"
+            nameKey="usuario" // nombre tal como viene del backend
             cx="50%"
             cy="50%"
             outerRadius={110}
-            label
+            label={(entry) =>
+              `${entry.usuario}: ${numberFormatter(entry[filtro])}`
+            }
           >
             {data.map((_, i) => (
               <Cell key={i} fill={COLORS[i % COLORS.length]} />
             ))}
           </Pie>
           <Legend />
-          <Tooltip />
+          <Tooltip formatter={numberFormatter} />
         </PieChart>
       </ResponsiveContainer>
     </div>

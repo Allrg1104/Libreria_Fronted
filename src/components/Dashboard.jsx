@@ -13,6 +13,9 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import SalesByUserChart from "../components/SalesByUserChart";
 
+const numberFormatter = (value) =>
+  new Intl.NumberFormat("es-CO").format(value);
+
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState("");
@@ -53,7 +56,7 @@ export default function Dashboard() {
       Object.entries(data.ventasPorUsuario).forEach(([usuario, productos]) => {
         Object.values(productos).forEach((prod) => {
           todas.push({
-            usuario,
+            usuario, // viene del backend como id_vendedor.name
             producto: prod.producto,
             cantidad: prod.cantidad,
             valor: prod.valor,
@@ -98,9 +101,9 @@ export default function Dashboard() {
       <Card>
         <CardContent className="text-center">
           <h3 className="text-lg font-semibold">Meta por Cantidad</h3>
-          <p className="text-2xl font-bold">{data.metas.cantidad}</p>
+          <p className="text-2xl font-bold">{numberFormatter(data.metas.cantidad)}</p>
           <p className="text-sm text-gray-600">
-            Actual: {data.metas.progresoCantidad}
+            Actual: {numberFormatter(data.metas.progresoCantidad)}
           </p>
         </CardContent>
       </Card>
@@ -108,9 +111,9 @@ export default function Dashboard() {
       <Card>
         <CardContent className="text-center">
           <h3 className="text-lg font-semibold">Meta por Valor</h3>
-          <p className="text-2xl font-bold">${data.metas.valor}</p>
+          <p className="text-2xl font-bold">${numberFormatter(data.metas.valor)}</p>
           <p className="text-sm text-gray-600">
-            Actual: ${data.metas.progresoValor}
+            Actual: ${numberFormatter(data.metas.progresoValor)}
           </p>
         </CardContent>
       </Card>
@@ -125,8 +128,8 @@ export default function Dashboard() {
             <BarChart data={data.topPorCantidad}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="producto" />
-              <YAxis />
-              <Tooltip />
+              <YAxis tickFormatter={numberFormatter} />
+              <Tooltip formatter={numberFormatter} />
               <Bar dataKey="cantidad" fill="#3b82f6" />
             </BarChart>
           </ResponsiveContainer>
@@ -143,8 +146,8 @@ export default function Dashboard() {
             <BarChart data={data.topPorValor}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="producto" />
-              <YAxis />
-              <Tooltip />
+              <YAxis tickFormatter={numberFormatter} />
+              <Tooltip formatter={numberFormatter} />
               <Bar dataKey="valor" fill="#10b981" />
             </BarChart>
           </ResponsiveContainer>
@@ -201,8 +204,8 @@ export default function Dashboard() {
                 <tr key={idx} className="border-t">
                   <td className="p-2">{v.usuario}</td>
                   <td className="p-2">{v.producto}</td>
-                  <td className="p-2 text-right">{v.cantidad}</td>
-                  <td className="p-2 text-right">${v.valor}</td>
+                  <td className="p-2 text-right">{numberFormatter(v.cantidad)}</td>
+                  <td className="p-2 text-right">${numberFormatter(v.valor)}</td>
                 </tr>
               ))}
             </tbody>
