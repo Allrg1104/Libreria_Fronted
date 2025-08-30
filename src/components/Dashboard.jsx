@@ -1,9 +1,3 @@
-¡Genial! 🙌
-Entonces dejamos toda la lógica consistente en Dashboard.jsx, normalizando v.vendedor → usuario para que el gráfico de SalesByUserChart funcione sin tocarlo.
-
-Aquí tienes el archivo completo y ajustado con esa corrección y los formateos ya listos 👇
-
-📌 Dashboard.jsx (final con topVendedores normalizado)
 import { useEffect, useState } from "react";
 import {
   BarChart,
@@ -33,7 +27,7 @@ export default function Dashboard() {
     fetch(url)
       .then((res) => res.json())
       .then((res) => {
-        // Normalizar valores numéricos
+        // Normalizar datos numéricos
         res.metas.cantidad = Number(res.metas.cantidad);
         res.metas.valor = Number(res.metas.valor);
         res.metas.progresoCantidad = Number(res.metas.progresoCantidad);
@@ -48,7 +42,7 @@ export default function Dashboard() {
           valor: Number(p.valor),
         }));
 
-        // 🔑 CORRECCIÓN: pasar vendedor → usuario
+        // Normalizar vendedores
         res.topVendedores = res.topVendedores.map((v) => ({
           usuario: v.vendedor,
           cantidad: Number(v.cantidad),
@@ -242,10 +236,35 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* ----- TOP VENDEDORES (GRÁFICO PIE) ----- */}
+      {/* ----- TOP VENDEDORES ----- */}
       <Card className="col-span-1 md:col-span-2">
         <CardContent>
           <SalesByUserChart data={data.topVendedores} />
+
+          {/* TOP 5 VENDEDORES EN TABLA */}
+          <h4 className="text-md font-semibold mt-6">Top 5 Vendedores</h4>
+          <table className="min-w-full text-sm border mt-2">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="text-left p-2">Usuario</th>
+                <th className="text-right p-2">Cantidad</th>
+                <th className="text-right p-2">Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.topVendedores.slice(0, 5).map((v, idx) => (
+                <tr key={idx} className="border-t">
+                  <td className="p-2">{v.usuario}</td>
+                  <td className="p-2 text-right">
+                    {numberFormatter(v.cantidad)}
+                  </td>
+                  <td className="p-2 text-right">
+                    ${numberFormatter(v.valor)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </CardContent>
       </Card>
     </div>
