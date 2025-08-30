@@ -1,10 +1,26 @@
 import React, { useState } from "react";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
-const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7f7f", "#8dd1e1", "#a4de6c", "#d0ed57", "#ffc0cb"];
+const COLORS = [
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff7f7f",
+  "#8dd1e1",
+  "#a4de6c",
+  "#d0ed57",
+  "#ffc0cb",
+];
 
 const numberFormatter = (value) =>
-  new Intl.NumberFormat("es-CO").format(value);
+  new Intl.NumberFormat("es-CO").format(Number(value));
 
 const SalesByUserChart = ({ data }) => {
   const [filtro, setFiltro] = useState("cantidad");
@@ -12,7 +28,7 @@ const SalesByUserChart = ({ data }) => {
   return (
     <div className="bg-white shadow rounded-2xl p-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Top Vendedores</h3>
+        <h3 className="text-lg font-semibold">Ventas por Usuario</h3>
         <select
           className="border p-2 rounded"
           value={filtro}
@@ -27,12 +43,16 @@ const SalesByUserChart = ({ data }) => {
           <Pie
             data={data}
             dataKey={filtro}
-            nameKey="usuario" // nombre tal como viene del backend
+            nameKey="usuario"
             cx="50%"
             cy="50%"
             outerRadius={110}
             label={(entry) =>
-              `${entry.usuario}: ${numberFormatter(entry[filtro])}`
+              `${entry.usuario}: ${
+                filtro === "valor"
+                  ? "$" + numberFormatter(entry[filtro])
+                  : numberFormatter(entry[filtro])
+              }`
             }
           >
             {data.map((_, i) => (
@@ -40,7 +60,13 @@ const SalesByUserChart = ({ data }) => {
             ))}
           </Pie>
           <Legend />
-          <Tooltip formatter={numberFormatter} />
+          <Tooltip
+            formatter={(value) =>
+              filtro === "valor"
+                ? "$" + numberFormatter(value)
+                : numberFormatter(value)
+            }
+          />
         </PieChart>
       </ResponsiveContainer>
     </div>

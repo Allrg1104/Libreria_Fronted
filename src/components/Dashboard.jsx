@@ -14,7 +14,7 @@ import { saveAs } from "file-saver";
 import SalesByUserChart from "../components/SalesByUserChart";
 
 const numberFormatter = (value) =>
-  new Intl.NumberFormat("es-CO").format(value);
+  new Intl.NumberFormat("es-CO").format(Number(value));
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
@@ -27,7 +27,7 @@ export default function Dashboard() {
     fetch(url)
       .then((res) => res.json())
       .then((res) => {
-        // Normalizar (asegurarnos que sean números)
+        // Normalizar
         res.metas.cantidad = Number(res.metas.cantidad);
         res.metas.valor = Number(res.metas.valor);
         res.metas.progresoCantidad = Number(res.metas.progresoCantidad);
@@ -114,10 +114,10 @@ export default function Dashboard() {
         <CardContent className="text-center">
           <h3 className="text-lg font-semibold">Meta por Cantidad</h3>
           <p className="text-2xl font-bold">
-            {numberFormatter(Number(data.metas.cantidad))}
+            {numberFormatter(data.metas.cantidad)}
           </p>
           <p className="text-sm text-gray-600">
-            Actual: {numberFormatter(Number(data.metas.progresoCantidad))}
+            Actual: {numberFormatter(data.metas.progresoCantidad)}
           </p>
         </CardContent>
       </Card>
@@ -126,10 +126,10 @@ export default function Dashboard() {
         <CardContent className="text-center">
           <h3 className="text-lg font-semibold">Meta por Valor</h3>
           <p className="text-2xl font-bold">
-            ${numberFormatter(Number(data.metas.valor))}
+            ${numberFormatter(data.metas.valor)}
           </p>
           <p className="text-sm text-gray-600">
-            Actual: ${numberFormatter(Number(data.metas.progresoValor))}
+            Actual: ${numberFormatter(data.metas.progresoValor)}
           </p>
         </CardContent>
       </Card>
@@ -145,7 +145,7 @@ export default function Dashboard() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="producto" />
               <YAxis tickFormatter={numberFormatter} />
-              <Tooltip formatter={(value) => numberFormatter(Number(value))} />
+              <Tooltip formatter={(value) => numberFormatter(value)} />
               <Bar dataKey="cantidad" fill="#3b82f6" />
             </BarChart>
           </ResponsiveContainer>
@@ -162,10 +162,8 @@ export default function Dashboard() {
             <BarChart data={data.topPorValor}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="producto" />
-              <YAxis tickFormatter={numberFormatter} />
-              <Tooltip
-                formatter={(value) => "$" + numberFormatter(Number(value))}
-              />
+              <YAxis tickFormatter={(v) => "$" + numberFormatter(v)} />
+              <Tooltip formatter={(value) => "$" + numberFormatter(value)} />
               <Bar dataKey="valor" fill="#10b981" />
             </BarChart>
           </ResponsiveContainer>
@@ -223,10 +221,10 @@ export default function Dashboard() {
                   <td className="p-2">{v.usuario}</td>
                   <td className="p-2">{v.producto}</td>
                   <td className="p-2 text-right">
-                    {numberFormatter(Number(v.cantidad))}
+                    {numberFormatter(v.cantidad)}
                   </td>
                   <td className="p-2 text-right">
-                    ${numberFormatter(Number(v.valor))}
+                    ${numberFormatter(v.valor)}
                   </td>
                 </tr>
               ))}
