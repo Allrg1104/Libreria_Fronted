@@ -19,8 +19,16 @@ const COLORS = [
   "#ffc0cb",
 ];
 
+// ---- FORMATTERS ----
 const numberFormatter = (value) =>
   new Intl.NumberFormat("es-CO").format(Number(value));
+
+const currencyFormatter = (value) =>
+  new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+  }).format(Number(value));
 
 const SalesByUserChart = ({ data }) => {
   const [filtro, setFiltro] = useState("cantidad");
@@ -50,7 +58,7 @@ const SalesByUserChart = ({ data }) => {
             label={(entry) =>
               `${entry.usuario}: ${
                 filtro === "valor"
-                  ? "$" + numberFormatter(entry[filtro])
+                  ? currencyFormatter(entry[filtro])
                   : numberFormatter(entry[filtro])
               }`
             }
@@ -63,7 +71,7 @@ const SalesByUserChart = ({ data }) => {
           <Tooltip
             formatter={(value) =>
               filtro === "valor"
-                ? "$" + numberFormatter(value)
+                ? currencyFormatter(value)
                 : numberFormatter(value)
             }
           />

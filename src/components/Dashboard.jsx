@@ -13,8 +13,16 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import SalesByUserChart from "../components/SalesByUserChart";
 
+// ---- FORMATTERS ----
 const numberFormatter = (value) =>
   new Intl.NumberFormat("es-CO").format(Number(value));
+
+const currencyFormatter = (value) =>
+  new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+  }).format(Number(value));
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
@@ -129,10 +137,10 @@ export default function Dashboard() {
         <CardContent className="text-center">
           <h3 className="text-lg font-semibold">Meta por Valor</h3>
           <p className="text-2xl font-bold">
-            ${numberFormatter(data.metas.valor)}
+            {currencyFormatter(data.metas.valor)}
           </p>
           <p className="text-sm text-gray-600">
-            Actual: ${numberFormatter(data.metas.progresoValor)}
+            Actual: {currencyFormatter(data.metas.progresoValor)}
           </p>
         </CardContent>
       </Card>
@@ -165,8 +173,8 @@ export default function Dashboard() {
             <BarChart data={data.topPorValor}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="producto" />
-              <YAxis tickFormatter={(v) => "$" + numberFormatter(v)} />
-              <Tooltip formatter={(value) => "$" + numberFormatter(value)} />
+              <YAxis tickFormatter={currencyFormatter} />
+              <Tooltip formatter={(value) => currencyFormatter(value)} />
               <Bar dataKey="valor" fill="#10b981" />
             </BarChart>
           </ResponsiveContainer>
@@ -227,7 +235,7 @@ export default function Dashboard() {
                     {numberFormatter(v.cantidad)}
                   </td>
                   <td className="p-2 text-right">
-                    ${numberFormatter(v.valor)}
+                    {currencyFormatter(v.valor)}
                   </td>
                 </tr>
               ))}
@@ -259,7 +267,7 @@ export default function Dashboard() {
                     {numberFormatter(v.cantidad)}
                   </td>
                   <td className="p-2 text-right">
-                    ${numberFormatter(v.valor)}
+                    {currencyFormatter(v.valor)}
                   </td>
                 </tr>
               ))}
