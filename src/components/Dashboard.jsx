@@ -27,7 +27,7 @@ export default function Dashboard() {
     fetch(url)
       .then((res) => res.json())
       .then((res) => {
-        // Normalizar valores numéricos por si vienen como strings
+        // Normalizar (asegurarnos que sean números)
         res.topPorCantidad = res.topPorCantidad.map((p) => ({
           ...p,
           cantidad: Number(p.cantidad),
@@ -38,8 +38,8 @@ export default function Dashboard() {
         }));
         res.topVendedores = res.topVendedores.map((v) => ({
           usuario: v.vendedor,
-          cantidad: Number(String(v.cantidad).replace(/\./g, "")),
-          valor: Number(String(v.valor).replace(/\./g, "")),
+          cantidad: Number(v.cantidad),
+          valor: Number(v.valor),
         }));
         setData(res);
       })
@@ -56,7 +56,7 @@ export default function Dashboard() {
       Object.entries(data.ventasPorUsuario).forEach(([usuario, productos]) => {
         Object.values(productos).forEach((prod) => {
           todas.push({
-            usuario, // viene del backend como id_vendedor.name
+            usuario,
             producto: prod.producto,
             cantidad: prod.cantidad,
             valor: prod.valor,
@@ -83,7 +83,14 @@ export default function Dashboard() {
 
   // ---- EXPORTAR ----
   const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(ventasUsuario);
+    const ws = XLSX.utils.json_to_sheet(
+      ventasUsuario.map((v) => ({
+        Usuario: v.usuario,
+        Producto: v.producto,
+        Cantidad: v.cantidad,
+        Valor: v.valor,
+      }))
+    );
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Ventas");
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
@@ -101,7 +108,9 @@ export default function Dashboard() {
       <Card>
         <CardContent className="text-center">
           <h3 className="text-lg font-semibold">Meta por Cantidad</h3>
-          <p className="text-2xl font-bold">{numberFormatter(data.metas.cantidad)}</p>
+          <p className="text-2xl font-bold">
+            {numberFormatter(data.metas.cantidad)}
+          </p>
           <p className="text-sm text-gray-600">
             Actual: {numberFormatter(data.metas.progresoCantidad)}
           </p>
@@ -111,7 +120,9 @@ export default function Dashboard() {
       <Card>
         <CardContent className="text-center">
           <h3 className="text-lg font-semibold">Meta por Valor</h3>
-          <p className="text-2xl font-bold">${numberFormatter(data.metas.valor)}</p>
+          <p className="text-2xl font-bold">
+            ${numberFormatter(data.metas.valor)}
+          </p>
           <p className="text-sm text-gray-600">
             Actual: ${numberFormatter(data.metas.progresoValor)}
           </p>
@@ -129,7 +140,7 @@ export default function Dashboard() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="producto" />
               <YAxis tickFormatter={numberFormatter} />
-              <Tooltip formatter={numberFormatter} />
+              <Tooltip formatter={(value) => numberFormatter(value)} />
               <Bar dataKey="cantidad" fill="#3b82f6" />
             </BarChart>
           </ResponsiveContainer>
@@ -147,7 +158,7 @@ export default function Dashboard() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="producto" />
               <YAxis tickFormatter={numberFormatter} />
-              <Tooltip formatter={numberFormatter} />
+              <Tooltip formatter={(value) => "$" + numberFormatter(value)} />
               <Bar dataKey="valor" fill="#10b981" />
             </BarChart>
           </ResponsiveContainer>
@@ -204,8 +215,12 @@ export default function Dashboard() {
                 <tr key={idx} className="border-t">
                   <td className="p-2">{v.usuario}</td>
                   <td className="p-2">{v.producto}</td>
-                  <td className="p-2 text-right">{numberFormatter(v.cantidad)}</td>
-                  <td className="p-2 text-right">${numberFormatter(v.valor)}</td>
+                  <td className="p-2 text-right">
+                    {numberFormatter(v.cantidad)}
+                  </td>
+                  <td className="p-2 text-right">
+                    ${numberFormatter(v.valor)}
+                  </td>
                 </tr>
               ))}
             </tbody>
