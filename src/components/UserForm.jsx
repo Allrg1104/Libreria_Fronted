@@ -33,8 +33,8 @@ const UserForm = () => {
         <input className="w-full p-2 border rounded mb-3" placeholder="Contraseña" type="password" name="password" value={form.password} onChange={handleChange} required />
         <select className="w-full p-2 border rounded mb-3" name="rol" value={form.rol} onChange={handleChange} required>
           <option value="">Seleccione un rol</option>
-          <option value="admin">Admin</option>
-          <option value="vendedor">Vendedor</option>
+          <option value="admin">admin</option>
+          <option value="vendedor">vendedor</option>
         </select>
         <button className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">Crear</button>
         {msg && <p className="mt-3 text-center text-sm">{msg}</p>}

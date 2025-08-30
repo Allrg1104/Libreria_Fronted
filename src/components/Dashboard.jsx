@@ -11,6 +11,7 @@ import {
 import { Card, CardContent } from "../components/Card";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import SalesByUserChart from "../components/SalesByUserChart";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
@@ -19,14 +20,28 @@ export default function Dashboard() {
 
   useEffect(() => {
     const url = `${import.meta.env.VITE_API_URL}/dashboard`;
-    //console.log("URL del dashboard:", url);
 
     fetch(url)
       .then((res) => res.json())
-      .then(setData)
+      .then((res) => {
+        // Normalizar valores numéricos por si vienen como strings
+        res.topPorCantidad = res.topPorCantidad.map((p) => ({
+          ...p,
+          cantidad: Number(p.cantidad),
+        }));
+        res.topPorValor = res.topPorValor.map((p) => ({
+          ...p,
+          valor: Number(p.valor),
+        }));
+        res.topVendedores = res.topVendedores.map((v) => ({
+          usuario: v.vendedor,
+          cantidad: Number(String(v.cantidad).replace(/\./g, "")),
+          valor: Number(String(v.valor).replace(/\./g, "")),
+        }));
+        setData(res);
+      })
       .catch((err) => console.error("Error cargando dashboard:", err));
   }, []);
-
 
   if (!data) return <p className="p-6">Cargando...</p>;
 
@@ -35,7 +50,6 @@ export default function Dashboard() {
     let todas = [];
 
     if (!usuarioSeleccionado) {
-      // Todos los usuarios
       Object.entries(data.ventasPorUsuario).forEach(([usuario, productos]) => {
         Object.values(productos).forEach((prod) => {
           todas.push({
@@ -47,7 +61,6 @@ export default function Dashboard() {
         });
       });
     } else {
-      // Solo un usuario
       const productos = data.ventasPorUsuario[usuarioSeleccionado] || {};
       Object.values(productos).forEach((prod) => {
         todas.push({
@@ -59,7 +72,6 @@ export default function Dashboard() {
       });
     }
 
-    // Ordenar dinámicamente
     todas.sort((a, b) => b[orden] - a[orden]);
     return todas;
   };
@@ -72,7 +84,9 @@ export default function Dashboard() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Ventas");
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const dataBlob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    const dataBlob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
     saveAs(dataBlob, `ventas_${usuarioSeleccionado || "todos"}.xlsx`);
   };
 
@@ -86,10 +100,7 @@ export default function Dashboard() {
           <h3 className="text-lg font-semibold">Meta por Cantidad</h3>
           <p className="text-2xl font-bold">{data.metas.cantidad}</p>
           <p className="text-sm text-gray-600">
-            Actual:{" "}
-            {Object.values(data.ventasPorUsuario)
-              .flatMap((prod) => Object.values(prod))
-              .reduce((sum, p) => sum + p.cantidad, 0)}
+            Actual: {data.metas.progresoCantidad}
           </p>
         </CardContent>
       </Card>
@@ -99,10 +110,7 @@ export default function Dashboard() {
           <h3 className="text-lg font-semibold">Meta por Valor</h3>
           <p className="text-2xl font-bold">${data.metas.valor}</p>
           <p className="text-sm text-gray-600">
-            Actual: $
-            {Object.values(data.ventasPorUsuario)
-              .flatMap((prod) => Object.values(prod))
-              .reduce((sum, p) => sum + p.valor, 0)}
+            Actual: ${data.metas.progresoValor}
           </p>
         </CardContent>
       </Card>
@@ -143,13 +151,12 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* ----- VENTAS POR USUARIO ----- */}
+      {/* ----- VENTAS POR USUARIO (TABLA) ----- */}
       <Card className="col-span-1 md:col-span-2">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold mb-4">Ventas por Usuario</h3>
 
           <div className="flex flex-col md:flex-row gap-4 mb-4 items-center">
-            {/* Selector de usuario */}
             <select
               className="border p-2 rounded"
               onChange={(e) => setUsuarioSeleccionado(e.target.value)}
@@ -163,7 +170,6 @@ export default function Dashboard() {
               ))}
             </select>
 
-            {/* Ordenar */}
             <select
               className="border p-2 rounded"
               onChange={(e) => setOrden(e.target.value)}
@@ -173,7 +179,6 @@ export default function Dashboard() {
               <option value="valor">Ordenar por Valor</option>
             </select>
 
-            {/* Botón exportar */}
             <button
               onClick={exportToExcel}
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
@@ -202,6 +207,13 @@ export default function Dashboard() {
               ))}
             </tbody>
           </table>
+        </CardContent>
+      </Card>
+
+      {/* ----- TOP VENDEDORES (GRÁFICO PIE) ----- */}
+      <Card className="col-span-1 md:col-span-2">
+        <CardContent>
+          <SalesByUserChart data={data.topVendedores} />
         </CardContent>
       </Card>
     </div>
