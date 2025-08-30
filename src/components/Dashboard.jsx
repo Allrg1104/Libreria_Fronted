@@ -28,6 +28,11 @@ export default function Dashboard() {
       .then((res) => res.json())
       .then((res) => {
         // Normalizar (asegurarnos que sean números)
+        res.metas.cantidad = Number(res.metas.cantidad);
+        res.metas.valor = Number(res.metas.valor);
+        res.metas.progresoCantidad = Number(res.metas.progresoCantidad);
+        res.metas.progresoValor = Number(res.metas.progresoValor);
+
         res.topPorCantidad = res.topPorCantidad.map((p) => ({
           ...p,
           cantidad: Number(p.cantidad),
@@ -58,8 +63,8 @@ export default function Dashboard() {
           todas.push({
             usuario,
             producto: prod.producto,
-            cantidad: prod.cantidad,
-            valor: prod.valor,
+            cantidad: Number(prod.cantidad),
+            valor: Number(prod.valor),
           });
         });
       });
@@ -69,8 +74,8 @@ export default function Dashboard() {
         todas.push({
           usuario: usuarioSeleccionado,
           producto: prod.producto,
-          cantidad: prod.cantidad,
-          valor: prod.valor,
+          cantidad: Number(prod.cantidad),
+          valor: Number(prod.valor),
         });
       });
     }
@@ -109,10 +114,10 @@ export default function Dashboard() {
         <CardContent className="text-center">
           <h3 className="text-lg font-semibold">Meta por Cantidad</h3>
           <p className="text-2xl font-bold">
-            {numberFormatter(data.metas.cantidad)}
+            {numberFormatter(Number(data.metas.cantidad))}
           </p>
           <p className="text-sm text-gray-600">
-            Actual: {numberFormatter(data.metas.progresoCantidad)}
+            Actual: {numberFormatter(Number(data.metas.progresoCantidad))}
           </p>
         </CardContent>
       </Card>
@@ -121,10 +126,10 @@ export default function Dashboard() {
         <CardContent className="text-center">
           <h3 className="text-lg font-semibold">Meta por Valor</h3>
           <p className="text-2xl font-bold">
-            ${numberFormatter(data.metas.valor)}
+            ${numberFormatter(Number(data.metas.valor))}
           </p>
           <p className="text-sm text-gray-600">
-            Actual: ${numberFormatter(data.metas.progresoValor)}
+            Actual: ${numberFormatter(Number(data.metas.progresoValor))}
           </p>
         </CardContent>
       </Card>
@@ -140,7 +145,7 @@ export default function Dashboard() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="producto" />
               <YAxis tickFormatter={numberFormatter} />
-              <Tooltip formatter={(value) => numberFormatter(value)} />
+              <Tooltip formatter={(value) => numberFormatter(Number(value))} />
               <Bar dataKey="cantidad" fill="#3b82f6" />
             </BarChart>
           </ResponsiveContainer>
@@ -158,7 +163,9 @@ export default function Dashboard() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="producto" />
               <YAxis tickFormatter={numberFormatter} />
-              <Tooltip formatter={(value) => "$" + numberFormatter(value)} />
+              <Tooltip
+                formatter={(value) => "$" + numberFormatter(Number(value))}
+              />
               <Bar dataKey="valor" fill="#10b981" />
             </BarChart>
           </ResponsiveContainer>
@@ -216,10 +223,10 @@ export default function Dashboard() {
                   <td className="p-2">{v.usuario}</td>
                   <td className="p-2">{v.producto}</td>
                   <td className="p-2 text-right">
-                    {numberFormatter(v.cantidad)}
+                    {numberFormatter(Number(v.cantidad))}
                   </td>
                   <td className="p-2 text-right">
-                    ${numberFormatter(v.valor)}
+                    ${numberFormatter(Number(v.valor))}
                   </td>
                 </tr>
               ))}
